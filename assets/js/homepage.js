@@ -22,17 +22,32 @@ var getUserRepos = function(user) {
     // FORMAT THE GITHUB API URL
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
     // MAKE THE SPECIFIC REQUEST TO THE URL AKA SERVER API
-    fetch(apiUrl).then(function(response) {
-        response.json().then(function(data) {
-            //SEND RESPONSE DATA FROM GETUSERREPOS TO DISPLAYREPOS
-            displayRepos(data, user);
-        });
+    fetch(apiUrl)
+        .then(function(response) {
+        //REVISE TO AN IF - ELSE TO HANDLE ERRORS
+        if (response.ok) {
+            response.json().then(function(data) {
+                //SEND RESPONSE DATA FROM GETUSERREPOS TO DISPLAYREPOS
+                displayRepos(data, user);
+            });
+        } else {
+            alert("Error: GitHub User Not Found");
+        }
+    })
+    //ADD NETWORK ERROR SOLUTION AS .CATCH CHAINED TO .THEN
+    .catch(function(error) {
+        alert("Unable to connect to GitHub");
     });
 };
 console.log("outside");
 
 //FUNCTION TO DISPLAY RESPONSE FROM SERVER 
 var displayRepos = function(repos,searchTerm) {
+    //CHECK FOR ANY REPOS
+    if (repos.length === 0){
+        repoContainerEl.textContent = "No repositories found.";
+        return;
+    }
     console.log(repos);
     console.log(searchTerm);
     //CLEAR OLD CONTENT BY ADDING STATEMENTS BELOW
