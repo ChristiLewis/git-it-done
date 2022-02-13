@@ -1,17 +1,21 @@
+var repoNameEl = document.querySelector("#repo-name");
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
 
-var displayWarning = function(repo) {
-    //ADD TEXT TO WARNING CONTAINER
-    limitWarningEl.textContent ="To see more than 30 issues, visit ";
-    //APPEND A LINK ELEMENT W/ AN HREF ATTR THAT POINTS TO THE GITHUB SITE
-    var linkEl = document.createElement("a");
-    linkEl.textContent = "See More Issues on GitHub.com";
-    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
-    linkEl.setAttribute("target", "_blank");
-
-    //APPEND TO WARNING CONTAINER
-    limitWarningEl.appendChild(linkEl);
+var getRepoName = function() {
+    //USE SPLIT()METHOD TO GET NAME FROM QUERY STRING
+    var queryString = document.location.search;
+    var repoName = queryString.split("=")[1];
+    
+    //ADD A CONDITIONAL STATEMENT
+    if(repoName) {
+        //DISPLAY NAME ON PAGE
+        repoNameEl.textContent = repoName;
+        getRepoIssues(repoName);
+    } else {
+        //HO REPO- USER GOES BACK TO HOMEPAGE
+        document.location.replace("./index.html");
+    }  
 };
 
 var getRepoIssues = function(repo) {
@@ -26,12 +30,13 @@ var getRepoIssues = function(repo) {
                 //CHECK FOR PAGINATION ISSUES
                 if (response.headers.get("Link")) {
                     displayWarning(repo);
-                        displayWarning.textContent = "repo has more than 30 issues";                   
+                        //REMOVED WARNING TEXT NOW THAT WE ARE REDIRECTING TO HOME                   
                 }
             });
         }
         else {
-            alert("There was a problem with your request!");
+            //REPLACE ALERT WITH A REDIRECT TO HOMEPAGE
+            document.location.replace("./index.html");
         }
     });
 };
@@ -59,12 +64,13 @@ var displayIssues = function(issues) {
         issueEl.appendChild(titleEl);
 
         //CREATE A TYPE ELEMENT
-        var typeEl =document.createElement("span");
+        var typeEl = document.createElement("span");
 
         //CHECK IF ISSUE OR PULL REQUEST
         if (issues[i].pull_request) {
             typeEl.textContent = "(Pull request)";
-        } else {
+        } 
+        else {
             typeEl.textContent = "(Issue)";
         }
 
@@ -77,4 +83,17 @@ var displayIssues = function(issues) {
 };
 
 
-getRepoIssues("facebook/react");
+var displayWarning = function(repo) {
+    //ADD TEXT TO WARNING CONTAINER
+    limitWarningEl.textContent ="To see more than 30 issues, visit ";
+    //APPEND A LINK ELEMENT W/ AN HREF ATTR THAT POINTS TO THE GITHUB SITE
+    var linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    //APPEND TO WARNING CONTAINER
+    limitWarningEl.appendChild(linkEl);
+};
+
+getRepoName();

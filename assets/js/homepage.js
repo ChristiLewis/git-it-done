@@ -11,6 +11,8 @@ var formSubmitHandler = function(event) {
 
     if (username) {
         getUserRepos(username);
+        //CLEAR OLD CONTENT
+        repoContainerEl.textContent = "";
         nameInputEl.value = "";
     }   else {
         alert("Please enter a GitHub username");
@@ -26,12 +28,14 @@ var getUserRepos = function(user) {
         .then(function(response) {
         //REVISE TO AN IF - ELSE TO HANDLE ERRORS
         if (response.ok) {
+            console.log(response);
             response.json().then(function(data) {
+                console.log(data);
                 //SEND RESPONSE DATA FROM GETUSERREPOS TO DISPLAYREPOS
                 displayRepos(data, user);
             });
         } else {
-            alert("Error: GitHub User Not Found");
+            alert("Error: " + response.statusText);
         }
     })
     //ADD NETWORK ERROR SOLUTION AS .CATCH CHAINED TO .THEN
@@ -39,8 +43,6 @@ var getUserRepos = function(user) {
         alert("Unable to connect to GitHub");
     });
 };
-console.log("outside");
-
 //FUNCTION TO DISPLAY RESPONSE FROM SERVER 
 var displayRepos = function(repos,searchTerm) {
     //CHECK FOR ANY REPOS
@@ -48,18 +50,19 @@ var displayRepos = function(repos,searchTerm) {
         repoContainerEl.textContent = "No repositories found.";
         return;
     }
-    console.log(repos);
-    console.log(searchTerm);
+
     //CLEAR OLD CONTENT BY ADDING STATEMENTS BELOW
     repoContainerEl.textContent = "";
     repoSearchTerm.textContent = searchTerm;
     //LOOP OVER REPOS
-    for (let i = 0; i < repos.length; i++) {
+    for (var i = 0; i < repos.length; i++) {
         // FORMAT REPO NAME
-        var repoName = repos[i].owner.login + repos[i].name;
+        var repoName = repos[i].owner.login + "/" + repos[i].name;
         // CREATE CONTAINER FOR EACH REPO
-        var repoEl = document.createElement("div");
+        var repoEl = document.createElement("a");
         repoEl.classList = "list-item flex-row justify-space-between align-center";
+        //LINK THE HOMEPAGE TO THE SiNGLE-REPO PAGE AND ADD QUERY PARAMETER
+        repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
         // CREATE SPAN EL TO HOLD REPO NAME
         var titleEl = document.createElement("span");
         titleEl.textContent = repoName;
