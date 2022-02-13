@@ -1,13 +1,33 @@
 var issueContainerEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
+
+var displayWarning = function(repo) {
+    //ADD TEXT TO WARNING CONTAINER
+    limitWarningEl.textContent ="To see more than 30 issues, visit ";
+    //APPEND A LINK ELEMENT W/ AN HREF ATTR THAT POINTS TO THE GITHUB SITE
+    var linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    //APPEND TO WARNING CONTAINER
+    limitWarningEl.appendChild(linkEl);
+};
 
 var getRepoIssues = function(repo) {
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
+
     fetch(apiUrl).then(function(response) {
         //SUCCESS
         if (response.ok) {
             response.json().then(function(data) {
                 //PASS RESPONSE DATA TO DOM FUNCTION
                 displayIssues(data);
+                //CHECK FOR PAGINATION ISSUES
+                if (response.headers.get("Link")) {
+                    displayWarning(repo);
+                        displayWarning.textContent = "repo has more than 30 issues";                   
+                }
             });
         }
         else {
@@ -57,4 +77,4 @@ var displayIssues = function(issues) {
 };
 
 
-getRepoIssues("ChristiLewis/git-it-done");
+getRepoIssues("facebook/react");
