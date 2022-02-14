@@ -1,4 +1,5 @@
 var userFormEl = document.querySelector("#user-form");
+var languageButtonsEl = document.querySelector("#language-buttons");
 var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
@@ -19,6 +20,17 @@ var formSubmitHandler = function(event) {
     }
 };
 
+var buttonClickHandler = function(event) {
+    // get the language attribute from the clicked element
+    var language = event.target.getAttribute("data-language");
+  
+    if (language) {
+      getFeaturedRepos(language);
+  
+      // clear old content
+      repoContainerEl.textContent = "";
+    }
+  };
 
 var getUserRepos = function(user) {
     // FORMAT THE GITHUB API URL
@@ -43,6 +55,24 @@ var getUserRepos = function(user) {
         alert("Unable to connect to GitHub");
     });
 };
+
+var getFeaturedRepos = function(response) {
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues"; 
+    
+    // make a get request to url
+    fetch(apiUrl).then(function(response) {
+        // request was successful
+        if (response.ok) {
+            response.json().then(function(data) {
+                displayRepos(data.items, language);
+            });
+        } 
+        else {
+            alert("Error: " + response.statusText);
+        }
+    });
+};
+
 //FUNCTION TO DISPLAY RESPONSE FROM SERVER 
 var displayRepos = function(repos,searchTerm) {
     //CHECK FOR ANY REPOS
@@ -88,3 +118,5 @@ var displayRepos = function(repos,searchTerm) {
 
 //REPLACE TYP FUNCTION CALLBACK WITH EVENT LISTENER AS CALLBACK
 userFormEl.addEventListener("submit", formSubmitHandler);
+
+languageButtonsEl.addEventListener("click", buttonClickHandler);
